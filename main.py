@@ -90,7 +90,8 @@ def main():
 
         matches = [song.id for song in songs if 
             round(song.tempo) == BPM and
-            song.energy >= energy_constraint
+            song.energy >= energy_minimum and 
+            song.danceability >= danceability_minimum
             ]
 
         spotify.user_playlist_add_tracks(user_id, playlist['id'], matches)
