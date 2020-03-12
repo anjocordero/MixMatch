@@ -3,9 +3,10 @@ import requests
 import spotipy
 import spotipy.util as util
 
-from env import SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI
-from config import username, BPM, max_track_limit, scope, playlist_name,\
-    energy_minimum, danceability_minimum
+from env import SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI,\
+    max_track_limit, scope
+from config import username, BPM, playlist_name,\
+    energy_minimum, danceability_minimum, round_to_tens
 
 class Song():
     '''
@@ -19,6 +20,11 @@ class Song():
         self.tempo = features['tempo']
         self.id = features['id']
 
+def convert_round():
+    if round_to_tens:
+        return -1
+    else:
+        return 0
 
 def get_all_saved_tracks(spotify):
     '''
@@ -63,6 +69,7 @@ def process_songs(spotify, saved):
 
 
 def main():
+    round_to_tens = convert_round()
     token = util.prompt_for_user_token(
         username=username,
         scope=scope,
@@ -89,7 +96,7 @@ def main():
         #playlist = spotify.user_playlist_create(user_id, playlist_name, public=False, description="Playlist created by Mix Match at " + str(BPM) + " BPM.")
 
         matches = [song.id for song in songs if 
-            round(song.tempo) == BPM and
+            round(song.tempo, round_to_tens) == BPM and
             song.energy >= energy_minimum and 
             song.danceability >= danceability_minimum
             ]
